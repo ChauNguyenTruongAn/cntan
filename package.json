@@ -1,0 +1,33 @@
+{
+  "name": "tecrmi",
+  "version": "1.0.0",
+  "description": "organization_management",
+  "license": "ISC",
+  "author": "cntan",
+  "type": "module",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "contract:emit": "prisma contract emit"
+  },
+  "dependencies": {
+    "@apollo/server": "^5.5.1",
+    "@prisma/client": "^7.10.0",
+    "@prisma/orm-postgres": "^8.0.0-rc.11",
+    "bcrypt": "^6.0.0",
+    "dataloader": "^2.2.3",
+    "dotenv": "^18.0.1",
+    "graphql": "^16.14.2",
+    "graphql-tag": "^2.12.7",
+    "jose": "^6.2.12",
+    "temporal-polyfill": "^1.0.5"
+  },
+  "devDependencies": {
+    "@prisma/cli-engine": "^0.2.3",
+    "@types/bcrypt": "^6.0.0",
+    "@types/node": "^26.6.1",
+    "prisma": "^8.0.0-rc.10",
+    "tsx": "^4.23.13",
+    "typescript": "^5.9.3"
+  }
+}

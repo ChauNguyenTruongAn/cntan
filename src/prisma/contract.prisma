@@ -1,0 +1,49 @@
+// use prisma-next
+// Contract inferred from the live database schema. Edit as needed, then run `prisma contract emit`.
+
+model Organizations {
+  id           Int            @id(map: "organizations_pkey") @default(autoincrement())
+  name         String   @unique(map: "organizations_name_key")
+  code         String    @unique(map: "organizations_code_key")
+  status       String    @default("ACTIVE")
+  createdAt    Timestamptz    @default(now()) @map("created_at")
+  subsidiaries Subsidiaries[]
+
+  @@check(expression: "((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'INACTIVE'::character varying])::text[]))", map: "organizations_status_check")
+  @@map("organizations")
+}
+
+model Subsidiaries {
+  id             Int           @id(map: "subsidiaries_pkey") @default(autoincrement())
+  organizationId Int           @map("organization_id")
+  name           String
+  code           String
+  country        String
+  status         String   @default("ACTIVE")
+  createdAt      Timestamptz   @default(now()) @map("created_at")
+  users          Users[]
+  organization   Organizations @relation(fields: [organizationId], references: [id], onDelete: Cascade, map: "subsidiaries_organization_id_fkey")
+
+  @@unique([organizationId, code], map: "subsidiaries_organization_id_code_key")
+  @@index([organizationId], map: "idx_subsidiaries_org")
+  @@check(expression: "((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'INACTIVE'::character varying])::text[]))", map: "subsidiaries_status_check")
+  @@map("subsidiaries")
+}
+
+model Users {
+  id           Int          @id(map: "users_pkey") @default(autoincrement())
+  subsidiaryId Int          @map("subsidiary_id")
+  email        String @unique(map: "users_email_key")
+  passwordHash String @map("password_hash")
+  fullName     String @map("full_name")
+  role         String @default("MEMBER")
+  status       String @default("ACTIVE")
+  createdAt    Timestamptz  @default(now()) @map("created_at")
+  subsidiary   Subsidiaries @relation(fields: [subsidiaryId], references: [id], onDelete: Cascade, map: "users_subsidiary_id_fkey")
+
+  @@index([email], map: "idx_users_email")
+  @@index([subsidiaryId], map: "idx_users_subsidiary")
+  @@check(expression: "((role)::text = ANY ((ARRAY['SUPER_ADMIN'::character varying, 'ORG_ADMIN'::character varying, 'MEMBER'::character varying])::text[]))", map: "users_role_check")
+  @@check(expression: "((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'INACTIVE'::character varying])::text[]))", map: "users_status_check")
+  @@map("users")
+}
