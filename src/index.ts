@@ -1,3 +1,4 @@
+import 'temporal-polyfill/full/global';
 import { ApolloServer } from "@apollo/server";
 import { typeDefs } from "./graphql/typeDefs";
 import { resolvers } from "./graphql/resolvers";

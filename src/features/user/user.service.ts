@@ -107,8 +107,8 @@ async function getUsers(args: GetUsersArgs, context: GraphQLContext) {
     "subsidiaryId"
   );
 
-  // 🛡️ Rule R1: Nếu là ORG_ADMIN, giới hạn chỉ xem users thuộc các chi nhánh trong Org của họ
-  if (context.user?.role === "ORG_ADMIN") {
+  // 🛡️ Rule R1: Nếu không phải SUPER_ADMIN, giới hạn chỉ xem users thuộc các chi nhánh trong Org của họ
+  if (context.user?.role !== "SUPER_ADMIN") {
     const orgSubs = await db.orm.public.Subsidiaries
       .select("id")
       .where((s) => s.organizationId.eq(context.user!.organizationId))
@@ -128,8 +128,8 @@ async function getUsers(args: GetUsersArgs, context: GraphQLContext) {
 
   // Filter theo subsidiaryId
   if (args.filter?.subsidiaryId) {
-    // Nếu là ORG_ADMIN, kiểm tra subsidiaryId có thuộc Org của họ không
-    if (context.user?.role === "ORG_ADMIN") {
+    // Nếu không phải SUPER_ADMIN, kiểm tra subsidiaryId có thuộc Org của họ không
+    if (context.user?.role !== "SUPER_ADMIN") {
       const sub = await db.orm.public.Subsidiaries
         .select("organizationId")
         .where((s) => s.id.eq(args.filter.subsidiaryId!))
@@ -247,6 +247,30 @@ async function reactivateUser(id: number, context: GraphQLContext) {
     .update({ status: "ACTIVE" as never });
 }
 
-export { createUser, changeUserRole, getUsers, deactivateUser, reactivateUser };
+// 6. Lấy danh sách Users theo subsidiaryId
+async function getUsersBySubsidiaryId(subsidiaryId: number) {
+  return await db.orm.public.Users
+    .select(
+      "id",
+      "email",
+      "fullName",
+      "role",
+      "status",
+      "createdAt",
+      "subsidiaryId"
+    )
+    .where((u) => u.subsidiaryId.eq(subsidiaryId))
+    .all();
+}
+
+export {
+  createUser,
+  changeUserRole,
+  getUsers,
+  deactivateUser,
+  reactivateUser,
+  getUsersBySubsidiaryId,
+};
+
 
 

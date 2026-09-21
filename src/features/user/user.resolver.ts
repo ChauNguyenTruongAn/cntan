@@ -6,6 +6,7 @@ import {
   getUsers,
   deactivateUser,
   reactivateUser,
+  getUsersBySubsidiaryId,
 } from "./user.service";
 import { CreateUserInput, ChangeUserRoleInput, GetUsersArgs } from "./user.type";
 
@@ -13,7 +14,7 @@ export const userResolvers = {
   Query: {
     users: async (_: unknown, args: GetUsersArgs, context: GraphQLContext) => {
       requireAuth(context);
-      requireRole(context, ["SUPER_ADMIN", "ORG_ADMIN"]);
+      requireRole(context, ["SUPER_ADMIN", "ORG_ADMIN", "MEMBER"]);
       return await getUsers(args, context);
     },
   },
@@ -58,5 +59,9 @@ export const userResolvers = {
       return await reactivateUser(args.id, context);
     },
   },
+  Subsidiary: {
+    users: async (parent: { id: number | string }) => {
+      return await getUsersBySubsidiaryId(Number(parent.id));
+    },
+  },
 };
-

@@ -11,6 +11,10 @@ export const userTypeDefs = gql`
     subsidiaryId: Int!
   }
 
+  extend type Subsidiary {
+    users: [User!]!
+  }
+
   input CreateUserInput {
     email: String!
     fullName: String!
